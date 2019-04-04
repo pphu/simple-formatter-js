@@ -1,0 +1,341 @@
+<html>
+
+<head>
+
+  <style>
+  body {
+    font-family : Arial,x-locale-body,sans-serif;
+    -webkit-font-smoothing : antialiased;
+  }
+    textarea {
+      font-family: "Lucida Console", Monaco, monospace
+    }
+    .wrapper {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      /* add code below to also center horizontally */
+      align-items: center;
+    }
+    #navbar {
+     display: flex;
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: rgba(53, 167, 255, 1);
+    }
+    #navbar li a  {
+      display: block;
+      text-align: center;
+      padding: 14px 16px;
+      text-decoration: none;
+    }
+
+    #navbar li a:link {
+      color: black;
+    }
+
+
+    #navbar li a:visited {
+      color: black;
+    }
+
+      /* mouse over link */
+    #navbar li a:hover,
+    #navbar .active li a,
+    #navbar .active li a:visited {
+      color: white;
+    }
+
+
+    pre {outline: 1px solid #ccc; padding: 5px; margin: 5px; }
+    .string { color: green; }
+    .number { color: darkorange; }
+    .boolean { color: blue; }
+    .null { color: magenta; }
+    .key { color: red; }
+  </style>
+  <script type="text/javascript">
+    var options = {};
+
+    var result;
+
+    const REGEX_SPLIT_KEEP_WHITESPACE = /(\s+)/;
+    const REGEX_SPLIT_BY_WHITESPACE = /\s+/;
+
+    // maintains which options the user selected in var options
+    function flipOptions(name) {
+      options[name] = !options[name];
+    }
+
+
+
+    function formatString() {
+      resetResult();
+      if (optionIsEnabled("addNewLine")) {
+        result = addNewLine(getInput());
+        console.log(result);
+      }
+      if (optionIsEnabled("addDoubleQuotes")) {
+        result = addDoubleQuotes(getInput());
+        console.log(result);
+      }
+
+      if (optionIsEnabled("addSingleQuote")) {
+        result = addSingleQuote(getInput());
+        console.log(result);
+      }
+
+      if (optionIsEnabled("addCommas")) {
+        result = addCommas(getInput());
+        console.log(result);
+      }
+
+
+      document.getElementById("result").value = result;
+
+    }
+
+    function formatJson() {
+      resetResult();
+
+      let input = JSON.stringify(JSON.parse(getInput()), null, 2);
+
+      if (optionIsEnabled("addSyntaxHighlighting")) {
+        result = addSyntaxHighlighting(input);
+        document.getElementById("jsonHighlightResult").appendChild(document.createElement('pre')).innerHTML = result;
+        document.getElementById("result").style.display = "none";
+      } else {
+        result = input;
+        document.getElementById("result").value = result;
+      }
+
+
+    }
+
+    function resetResult() {
+      result = "";
+      document.getElementById("result").value = result;
+      document.getElementById("result").style.display = "inline";
+
+
+      //fastest way of removing innerHTML see https://jsperf.com/innerhtml-vs-removechild/15
+      let jsonResult = document.getElementById("jsonHighlightResult");
+      while (jsonResult.firstChild) {
+          jsonResult.removeChild(jsonResult.firstChild);
+      }
+    }
+
+    function optionIsEnabled(option) {
+      return options.hasOwnProperty(option) && options[option];
+    }
+
+    /**
+    * Adds commas after a non-blank String while maintaining whitespace
+    *
+    * Non-blank is defined as a String.trim().length > 0
+    *
+    * Examples:
+    * addCommas("asd asd asd") //result =
+    *
+    *
+    */
+    function addCommas(input) {
+      let arrStringInput = input.split(REGEX_SPLIT_KEEP_WHITESPACE);
+      let commaResults = "";
+
+      for (let index in arrStringInput) {
+        if(arrStringInput[index].isEmpty()) {
+          commaResults += arrStringInput[index];
+        } else {
+          commaResults +=  arrStringInput[index] + ",";
+        }
+      }
+
+      return commaResults;
+    }
+
+    /**
+    * Adds double quotes around a non-blank String while maintaining whitespace
+    *
+    * Non-blank is defined as a String.trim().length > 0
+    *
+    * Examples:
+    * addDoubleQuotes("asd asd asd"); // result = ""asd" "asd" "asd""
+    * addDoubleQuotes("     ")        // result = "     "
+    * addDoubleQuotes("asd    asd")   // result = ""asd"    "asd""
+    */
+    function addDoubleQuotes(input) {
+      let arrStringInput = input.split(REGEX_SPLIT_KEEP_WHITESPACE);
+      let doubleQuotesResults = "";
+
+      for (let index in arrStringInput) {
+        if(arrStringInput[index].isEmpty()) {
+          doubleQuotesResults += arrStringInput[index];
+        } else {
+          doubleQuotesResults += "\"" + arrStringInput[index] + "\"";
+        }
+      }
+
+      return doubleQuotesResults;
+    }
+    /**
+    * Adds single quotes around a non-blank String while maintaining whitespace
+    *
+    * Non-blank is defined as a String.trim().length > 0
+    *
+    * Examples:
+    * addSingleQuote("asd asd asd"); // result = "'asd' 'asd' 'asd'"
+    * addSingleQuote("     ")        // result = "     "
+    * addSingleQuote("asd    asd")   // result = "'asd'    'asd'"
+    */
+    function addSingleQuote(input) {
+      let arrStringInput = input.split(REGEX_SPLIT_KEEP_WHITESPACE);
+      let singleQuotesResults = "";
+
+      for (let index in arrStringInput) {
+        if(arrStringInput[index].isEmpty()) {
+          singleQuotesResults += arrStringInput[index];
+        } else {
+          singleQuotesResults += "\'" + arrStringInput[index] + "\'";
+        }
+      }
+
+      return singleQuotesResults;
+    }
+
+    /**
+    * Replaces all whitespace with newline (\n)
+    */
+    function addNewLine(input) {
+
+      let arrStringInput = input.split(REGEX_SPLIT_BY_WHITESPACE);
+      let newLineResult = "";
+
+      for (let index in arrStringInput) {
+        newLineResult += arrStringInput[index] + "\n";
+      }
+
+      return newLineResult;
+    }
+
+    /**
+    * Using regex, add syntax highligiting
+    * Using https://stackoverflow.com/questions/4810841/how-can-i-pretty-print-json-using-javascript
+    */
+    function addSyntaxHighlighting(input) {
+      if (typeof input != 'string') {
+           input = JSON.stringify(input, undefined, 2);
+      }
+      input = input.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      return input.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+          var cls = 'number';
+          if (/^"/.test(match)) {
+              if (/:$/.test(match)) {
+                  cls = 'key';
+              } else {
+                  cls = 'string';
+              }
+          } else if (/true|false/.test(match)) {
+              cls = 'boolean';
+          } else if (/null/.test(match)) {
+              cls = 'null';
+          }
+          return '<span class="' + cls + '">' + match + '</span>';
+      });
+    }
+
+    /**
+    * Returns the input from the user or the work in progress result
+    */
+    function getInput() {
+      if(result) {
+        return result;
+      }
+      return document.getElementById("user-input").value;
+    }
+
+
+    /**
+    * adding isEmpty helper to Strings
+    */
+    String.prototype.isEmpty = function() {
+      return (this.length === 0 || !this.trim());
+    };
+
+    function setupDefaults() {
+      var jsonLink = document.getElementById("json_link");
+      var jsonOptions = document.getElementById("user_selected_options_json");
+      var stringLink = document.getElementById("string_link");
+      var stringOptions = document.getElementById("user_selected_options_string");
+
+      if(window.location.hash && window.location.hash.substring(1) === "json") {
+        jsonOptions.style.display = "inline";
+        jsonLink.classList.add("active");
+        stringOptions.style.display = "none";
+        stringLink.classList.remove("active");
+        document.getElementById("add_syntax_highlighting").checked = true;
+        options = {
+          addSyntaxHighlighting : true
+        }
+      } else {
+        stringOptions.style.display = "inline";
+        stringLink.classList.add("active");
+        jsonOptions.style.display = "none";
+        jsonLink.classList.remove("active");
+        document.getElementById("add_commas_box").checked = true;
+        document.getElementById("add_double_quotes_box").checked = true;
+        document.getElementById("add_single_quotes_box").checked = false;
+        document.getElementById("add_newline_line_box").checked = true;
+        options = {
+          addNewLine : true,
+          addDoubleQuotes : true,
+          addCommas : true,
+        };
+      }
+    }
+    window.onload = setupDefaults;
+    window.onhashchange = setupDefaults;
+
+  </script>
+</head>
+
+<body>
+
+  <div class="wrapper">
+    <div>
+      <ul id="navbar">
+        <li>
+          <a id="json_link" href="#json">JSON Beautifier</a>
+        </li>
+        <li>
+          <a id="string_link" href="#string">String Formatter</a>
+        </li>
+    </div>
+    <div>
+      <textarea rows="25" cols="120" id="user-input"></textarea>
+
+    </div>
+    <div id="user_selected_options_string">
+      <input id="add_newline_line_box" type="checkbox" onclick="flipOptions('addNewLine')"/><label for="add_newline_line_box">Add New Line</label>
+      <input id="add_double_quotes_box" type="checkbox" onclick="flipOptions('addDoubleQuotes')"/><label for="add_double_quotes_box">Add Double Quotes</label>
+      <input id="add_single_quotes_box" type="checkbox" onclick="flipOptions('addSingleQuote')"/><label for="add_single_quotes_box">Add Single Quotes</label>
+      <input id="add_commas_box" type="checkbox" onclick="flipOptions('addCommas')"/><label for="add_commas_box">Add Commas</label>
+      <button type="button" name="button" onclick="formatString()">Format</button>
+    </div>
+    <div id="user_selected_options_json" style="display: none">
+      <input id="add_syntax_highlighting" type="checkbox" onclick="flipOptions('addSyntaxHighlighting')"/><label for="add_syntax_highlighting">Add Syntax Highlighting</label>
+      <button type="button" name="button" onclick="formatJson()">Format</button>
+    </div>
+
+
+    <div>
+      <textarea rows="25" cols="120" id="result"></textarea>
+      <div id="jsonHighlightResult">
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
