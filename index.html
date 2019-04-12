@@ -35,20 +35,30 @@ https://github.com/pphu/simple-formatter-js
       text-decoration: none;
     }
 
-    #navbar li a:link {
+    #navbar li a:link, .footer a {
       color: black;
     }
 
 
-    #navbar li a:visited {
+    #navbar li a:visited, .footer a.link {
       color: black;
     }
 
       /* mouse over link */
+    .footer a.link,
     #navbar li a:hover,
     #navbar .active li a,
     #navbar .active li a:visited {
       color: white;
+    }
+
+    .footer {
+      position: fixed;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      color: white;
+      text-align: right;
     }
 
 
@@ -102,16 +112,19 @@ https://github.com/pphu/simple-formatter-js
 
     function formatJson() {
       resetResult();
+      try {
+        let input = JSON.stringify(JSON.parse(getInput()), null, 2);
 
-      let input = JSON.stringify(JSON.parse(getInput()), null, 2);
-
-      if (optionIsEnabled("addSyntaxHighlighting")) {
-        result = addSyntaxHighlighting(input);
-        document.getElementById("jsonHighlightResult").appendChild(document.createElement('pre')).innerHTML = result;
-        document.getElementById("result").style.display = "none";
-      } else {
-        result = input;
-        document.getElementById("result").value = result;
+        if (optionIsEnabled("addSyntaxHighlighting")) {
+          result = addSyntaxHighlighting(input);
+          document.getElementById("jsonHighlightResult").appendChild(document.createElement('pre')).innerHTML = result;
+          document.getElementById("result").style.display = "none";
+        } else {
+          result = input;
+          document.getElementById("result").value = result;
+        }
+      } catch (err) {
+        document.getElementById("result").value = err;
       }
 
 
@@ -340,5 +353,7 @@ https://github.com/pphu/simple-formatter-js
     </div>
   </div>
 </body>
-
+<footer class="footer">
+  <a href="https://github.com/pphu/">@pphu</a>
+</footer>
 </html>
