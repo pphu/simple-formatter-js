@@ -109,6 +109,10 @@ https://github.com/pphu/simple-formatter-js
         result = seperateRubyObject(getInput());
         console.log(result)
       }
+      if(optionIsEnabled("removeWhiteSpace")) {
+        result = removeWhiteSpace(getInput());
+        console.log(result)
+      }
 
 
       document.getElementById("result").value = result;
@@ -258,6 +262,20 @@ https://github.com/pphu/simple-formatter-js
     }
 
     /**
+    * Removes whitespace. Useful for flatten JSON
+    */
+    function removeWhiteSpace(input) {
+      let arrStringInput = input.split(/\s/g);
+      let result = "";
+
+      for (let index in arrStringInput) {
+      result += arrStringInput[index];
+      }
+
+      return result;
+    }
+
+    /**
     * Using regex, add syntax highligiting
     * Using https://stackoverflow.com/questions/4810841/how-can-i-pretty-print-json-using-javascript
     */
@@ -326,11 +344,13 @@ https://github.com/pphu/simple-formatter-js
         document.getElementById("add_single_quotes_box").checked = false;
         document.getElementById("replace_whitespace_with_newline_box").checked = false;
         document.getElementById("seperate_ruby_object_box").checked = false;
+        document.getElementById("remove_white_space").checked = false;
         options = {
           replaceWhiteSpaceWithNewLine : false,
           addDoubleQuotes : false,
           addCommas : false,
           seperateRubyObject : false,
+          removeWhiteSpace: false,
         };
       }
     }
@@ -361,6 +381,7 @@ https://github.com/pphu/simple-formatter-js
       <input id="add_double_quotes_box" type="checkbox" onclick="flipOptions('addDoubleQuotes')"/><label for="add_double_quotes_box">Add Double Quotes</label>
       <input id="add_single_quotes_box" type="checkbox" onclick="flipOptions('addSingleQuote')"/><label for="add_single_quotes_box">Add Single Quotes</label>
       <input id="add_commas_box" type="checkbox" onclick="flipOptions('addCommas')"/><label for="add_commas_box">Add Commas</label>
+      <input id="remove_white_space" type="checkbox" onclick="flipOptions('removeWhiteSpace')"/><label for="remove_white_space">Remove White Space</label>
       <input id="seperate_ruby_object_box" type="checkbox" onclick="flipOptions('seperateRubyObject')"/><label for="seperate_ruby_object_box">Seperate Ruby Objects</label>
       <button type="button" name="button" onclick="formatString()">Format</button>
     </div>
