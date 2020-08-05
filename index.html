@@ -11,7 +11,7 @@ https://github.com/pphu/simple-formatter-js
     -webkit-font-smoothing : antialiased;
   }
     textarea {
-      font-family: "Lucida Console", Monaco, monospace
+      font-family: "Lucida Console", Monaco, monospace;
     }
     .wrapper {
       display: flex;
@@ -109,11 +109,6 @@ https://github.com/pphu/simple-formatter-js
         result = seperateRubyObject(getInput());
         console.log(result)
       }
-      if(optionIsEnabled("removeWhiteSpace")) {
-        result = removeWhiteSpace(getInput());
-        console.log(result)
-      }
-
 
       document.getElementById("result").value = result;
 
@@ -121,22 +116,26 @@ https://github.com/pphu/simple-formatter-js
 
     function formatJson() {
       resetResult();
-      try {
-        let input = JSON.stringify(JSON.parse(getInput()), null, 2);
+      if (optionIsEnabled("flattenJson")) {
+        result = flattenJson(getInput());
+        console.log(result)
+        document.getElementById("result").value = result;
+      } else {
+        try {
+          let input = JSON.stringify(JSON.parse(getInput()), null, 2);
 
-        if (optionIsEnabled("addSyntaxHighlighting")) {
-          result = addSyntaxHighlighting(input);
-          document.getElementById("jsonHighlightResult").appendChild(document.createElement('pre')).innerHTML = result;
-          document.getElementById("result").style.display = "none";
-        } else {
-          result = input;
-          document.getElementById("result").value = result;
+          if (optionIsEnabled("addSyntaxHighlighting")) {
+            result = addSyntaxHighlighting(input);
+            document.getElementById("jsonHighlightResult").appendChild(document.createElement('pre')).innerHTML = result;
+            document.getElementById("result").style.display = "none";
+          } else {
+            result = input;
+            document.getElementById("result").value = result;
+          }
+        } catch (err) {
+          document.getElementById("result").value = err;
         }
-      } catch (err) {
-        document.getElementById("result").value = err;
       }
-
-
     }
 
     function resetResult() {
@@ -262,17 +261,41 @@ https://github.com/pphu/simple-formatter-js
     }
 
     /**
-    * Removes whitespace. Useful for flatten JSON
+    * Flatten JSON
+    * https://stackoverflow.com/questions/19098797/fastest-way-to-flatten-un-flatten-nested-json-objects
     */
-    function removeWhiteSpace(input) {
-      let arrStringInput = input.split(/\s/g);
-      let result = "";
+    function flattenJson(input) {
+      // let arrStringInput = input.split(/\s/g);
+      // let result = "";
 
-      for (let index in arrStringInput) {
-      result += arrStringInput[index];
+      // for (let index in arrStringInput) {
+      // result += arrStringInput[index];
+      // }
+
+      // return result;
+
+      var result = {};
+      function recurse (cur, prop) {
+          if (Object(cur) !== cur) {
+              result[prop] = cur;
+          } else if (Array.isArray(cur)) {
+              for(var i=0, l=cur.length; i<l; i++)
+                  recurse(cur[i], prop + "[" + i + "]");
+              if (l == 0)
+                  result[prop] = [];
+          } else {
+              var isEmpty = true;
+              for (var p in cur) {
+                  isEmpty = false;
+                  recurse(cur[p], prop ? prop+"."+p : p);
+              }
+              if (isEmpty && prop)
+                  result[prop] = {};
+          }
       }
-
-      return result;
+      recurse(JSON.parse(input), "");
+      console.log(result)
+      return JSON.stringify(result);
     }
 
     /**
@@ -331,8 +354,10 @@ https://github.com/pphu/simple-formatter-js
         stringOptions.style.display = "none";
         stringLink.classList.remove("active");
         document.getElementById("add_syntax_highlighting").checked = true;
+        document.getElementById("flatten_json").checked = false;
         options = {
-          addSyntaxHighlighting : true
+          addSyntaxHighlighting : true,
+          flattenJson: false,
         }
       } else {
         stringOptions.style.display = "inline";
@@ -344,13 +369,11 @@ https://github.com/pphu/simple-formatter-js
         document.getElementById("add_single_quotes_box").checked = false;
         document.getElementById("replace_whitespace_with_newline_box").checked = false;
         document.getElementById("seperate_ruby_object_box").checked = false;
-        document.getElementById("remove_white_space").checked = false;
         options = {
           replaceWhiteSpaceWithNewLine : false,
           addDoubleQuotes : false,
           addCommas : false,
           seperateRubyObject : false,
-          removeWhiteSpace: false,
         };
       }
     }
@@ -381,17 +404,17 @@ https://github.com/pphu/simple-formatter-js
       <input id="add_double_quotes_box" type="checkbox" onclick="flipOptions('addDoubleQuotes')"/><label for="add_double_quotes_box">Add Double Quotes</label>
       <input id="add_single_quotes_box" type="checkbox" onclick="flipOptions('addSingleQuote')"/><label for="add_single_quotes_box">Add Single Quotes</label>
       <input id="add_commas_box" type="checkbox" onclick="flipOptions('addCommas')"/><label for="add_commas_box">Add Commas</label>
-      <input id="remove_white_space" type="checkbox" onclick="flipOptions('removeWhiteSpace')"/><label for="remove_white_space">Remove White Space</label>
       <input id="seperate_ruby_object_box" type="checkbox" onclick="flipOptions('seperateRubyObject')"/><label for="seperate_ruby_object_box">Seperate Ruby Objects</label>
       <button type="button" name="button" onclick="formatString()">Format</button>
     </div>
     <div id="user_selected_options_json" style="display: none">
       <input id="add_syntax_highlighting" type="checkbox" onclick="flipOptions('addSyntaxHighlighting')"/><label for="add_syntax_highlighting">Add Syntax Highlighting</label>
+      <input id="flatten_json" type="checkbox" onclick="flipOptions('flattenJson')"/><label for="flatten_json">Flatten JSON</label>
       <button type="button" name="button" onclick="formatJson()">Format</button>
     </div>
 
 
-    <div>
+    <div id="result-area">
       <textarea rows="25" cols="120" id="result"></textarea>
       <div id="jsonHighlightResult">
       </div>
