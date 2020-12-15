@@ -116,7 +116,12 @@ https://github.com/pphu/simple-formatter-js
 
     function formatJson() {
       resetResult();
-      if (optionIsEnabled("flattenJson")) {
+      if (optionIsEnabled("stringifyJson")) {
+        result = JSON.stringify(JSON.parse(getInput()));
+
+        console.log(result)
+        document.getElementById("result").value = result;
+      } else if (optionIsEnabled("flattenJson")) {
         result = flattenJson(getInput());
         console.log(result)
         document.getElementById("result").value = result;
@@ -245,7 +250,7 @@ https://github.com/pphu/simple-formatter-js
     }
 
     /**
-     * Seperates Ruby Objects with newlines 
+     * Seperates Ruby Objects with newlines
      */
     function seperateRubyObject(input) {
       let token = ">, ";
@@ -358,6 +363,7 @@ https://github.com/pphu/simple-formatter-js
         options = {
           addSyntaxHighlighting : true,
           flattenJson: false,
+          stringifyJson: false,
         }
       } else {
         stringOptions.style.display = "inline";
@@ -410,6 +416,7 @@ https://github.com/pphu/simple-formatter-js
     <div id="user_selected_options_json" style="display: none">
       <input id="add_syntax_highlighting" type="checkbox" onclick="flipOptions('addSyntaxHighlighting')"/><label for="add_syntax_highlighting">Add Syntax Highlighting</label>
       <input id="flatten_json" type="checkbox" onclick="flipOptions('flattenJson')"/><label for="flatten_json">Flatten JSON</label>
+      <input id="flatten_json" type="checkbox" onclick="flipOptions('stringifyJson')"/><label for="stringify_json">Stringify JSON</label>
       <button type="button" name="button" onclick="formatJson()">Format</button>
     </div>
 
