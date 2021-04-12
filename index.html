@@ -110,6 +110,12 @@ https://github.com/pphu/simple-formatter-js
         console.log(result)
       }
 
+
+      if(optionIsEnabled("flattenToOneLine")) {
+        result = flattenToOneLine(getInput());
+        console.log(result)
+      }
+
       document.getElementById("result").value = result;
 
     }
@@ -265,6 +271,15 @@ https://github.com/pphu/simple-formatter-js
       return result;
     }
 
+
+    /**
+     * Flattnes to one line
+     */
+    function flattenToOneLine(input) {
+      let token = "\n";
+      let result = input.replace(/\n/g, '')
+      return result;
+    }
     /**
     * Flatten JSON
     * https://stackoverflow.com/questions/19098797/fastest-way-to-flatten-un-flatten-nested-json-objects
@@ -375,11 +390,13 @@ https://github.com/pphu/simple-formatter-js
         document.getElementById("add_single_quotes_box").checked = false;
         document.getElementById("replace_whitespace_with_newline_box").checked = false;
         document.getElementById("seperate_ruby_object_box").checked = false;
+        document.getElementById("flatten_to_one_line").checked = false;
         options = {
           replaceWhiteSpaceWithNewLine : false,
           addDoubleQuotes : false,
           addCommas : false,
           seperateRubyObject : false,
+          flattenToOneLine: false,
         };
       }
     }
@@ -411,6 +428,7 @@ https://github.com/pphu/simple-formatter-js
       <input id="add_single_quotes_box" type="checkbox" onclick="flipOptions('addSingleQuote')"/><label for="add_single_quotes_box">Add Single Quotes</label>
       <input id="add_commas_box" type="checkbox" onclick="flipOptions('addCommas')"/><label for="add_commas_box">Add Commas</label>
       <input id="seperate_ruby_object_box" type="checkbox" onclick="flipOptions('seperateRubyObject')"/><label for="seperate_ruby_object_box">Seperate Ruby Objects</label>
+      <input id="flatten_to_one_line_box" type="checkbox" onclick="flipOptions('flattenToOneLine')"/><label for="flatten_to_one_line_box">Flatten to One Line</label>
       <button type="button" name="button" onclick="formatString()">Format</button>
     </div>
     <div id="user_selected_options_json" style="display: none">
